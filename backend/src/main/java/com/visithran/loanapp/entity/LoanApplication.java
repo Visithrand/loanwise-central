@@ -31,6 +31,12 @@ public class LoanApplication {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
     
+    @Column(columnDefinition = "TEXT")
+    private String description;
+    
+    @Column(nullable = false)
+    private String selectedBankBranch;
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
@@ -41,25 +47,19 @@ public class LoanApplication {
     @Column(nullable = false)
     private LocalDateTime createdAt;
     
-    @OneToMany(mappedBy = "loanApplication", cascade = CascadeType.ALL)
-    private List<ApplicationDocument> documents;
-    
-    @OneToMany(mappedBy = "loanApplication", cascade = CascadeType.ALL)
-    private List<AuditLog> auditLogs;
-    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         if (status == null) {
-            status = Status.PENDING;
+            status = Status.SUBMITTED;
         }
     }
     
     public enum LoanType {
-        PERSONAL, BUSINESS, MORTGAGE, AUTO, STUDENT
+        PERSONAL_LOAN, EDUCATION_LOAN, HOUSE_LOAN, JEWEL_LOAN, AUTO_LOAN
     }
     
     public enum Status {
-        PENDING, APPROVED, REJECTED
+        SUBMITTED, APPROVED, REJECTED, VIEWED
     }
 }

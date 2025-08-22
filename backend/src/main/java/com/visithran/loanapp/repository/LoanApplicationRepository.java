@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -20,13 +19,10 @@ public interface LoanApplicationRepository extends JpaRepository<LoanApplication
     Page<LoanApplication> findByStatus(Status status, Pageable pageable);
     
     @Query("SELECT la FROM LoanApplication la WHERE " +
-           "la.applicant.username LIKE %:search% OR " +
+           "la.applicant.name LIKE %:search% OR " +
            "la.applicant.email LIKE %:search% OR " +
            "CAST(la.id AS string) LIKE %:search%")
     Page<LoanApplication> findBySearchTerm(@Param("search") String search, Pageable pageable);
     
-    @Query("SELECT la FROM LoanApplication la WHERE " +
-           "la.status IN ('APPROVED', 'REJECTED') AND " +
-           "la.createdAt < :cutoffDate")
-    List<LoanApplication> findOldApplicationsForArchiving(@Param("cutoffDate") LocalDateTime cutoffDate);
+    List<LoanApplication> findByStatus(Status status);
 }

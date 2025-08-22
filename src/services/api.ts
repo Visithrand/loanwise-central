@@ -1,191 +1,86 @@
-// API Service for connecting to Spring Boot Backend
+import { 
+  UserLoginRequest, 
+  UserResponse, 
+  LoanApplicationRequest, 
+  LoanApplication, 
+  BankBranch,
+  ApiResponse 
+} from '../types/api-types';
+
 const API_BASE_URL = 'http://localhost:8080/api';
 
-// Types for API requests and responses
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  role: 'APPLICANT' | 'AGENT' | 'ADMIN';
-}
-
-export interface AuthRequest {
-  username: string;
-  email: string;
-  password: string;
-  role?: string;
-}
-
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  type: string;
-  user: User;
-}
-
-export interface LoanType {
-  PERSONAL: 'PERSONAL';
-  BUSINESS: 'BUSINESS';
-  MORTGAGE: 'MORTGAGE';
-  AUTO: 'AUTO';
-  STUDENT: 'STUDENT';
-}
-
-export interface LoanStatus {
-  PENDING: 'PENDING';
-  APPROVED: 'APPROVED';
-  REJECTED: 'REJECTED';
-}
-
-export interface Document {
-  id: number;
-  documentName: string;
-  fileUrl: string;
-  fileType: string;
-  fileSize: number;
-}
-
-export interface LoanApplication {
-  id: number;
-  applicant: User;
-  loanType: keyof LoanType;
-  amount: number;
-  status: keyof LoanStatus;
-  rejectionReason?: string;
-  createdAt: string;
-  documents?: Document[];
-}
-
-export interface LoanApplicationRequest {
-  loanType: keyof LoanType;
-  amount: number;
-}
-
-export interface LoanStatusUpdateRequest {
-  status: keyof LoanStatus;
-  rejectionReason?: string;
-}
-
-export interface ApiResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
-
-// API Service Class
 class ApiService {
-  private baseUrl: string;
-  private token: string | null = null;
-
-  constructor(baseUrl: string = API_BASE_URL) {
-    this.baseUrl = baseUrl;
-    // Load token from localStorage on initialization
-    this.token = localStorage.getItem('authToken');
-  }
-
-  private getHeaders(): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
-    }
-
-    return headers;
-  }
-
   private async request<T>(
-    endpoint: string,
+    endpoint: string, 
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}`;
     const config: RequestInit = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
       ...options,
-      headers: this.getHeaders(),
     };
 
     try {
       const response = await fetch(url, config);
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-      }
-
-      // Handle empty responses
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        return await response.json();
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      return {} as T;
+      return await response.json();
     } catch (error) {
       console.error('API request failed:', error);
       throw error;
     }
   }
 
-  // Authentication methods
-  async register(request: AuthRequest): Promise<AuthResponse> {
-    const response = await this.request<AuthResponse>('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
-    
-    // Store token
-    this.token = response.token;
-    localStorage.setItem('authToken', response.token);
-    
-    return response;
-  }
-
-  async login(request: LoginRequest): Promise<AuthResponse> {
-    const response = await this.request<AuthResponse>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
-    
-    // Store token
-    this.token = response.token;
-    localStorage.setItem('authToken', response.token);
-    
-    return response;
-  }
-
-  logout(): void {
-    this.token = null;
-    localStorage.removeItem('authToken');
-  }
-
-  // User methods
-  async getCurrentUser(): Promise<User> {
-    return this.request<User>('/users/me');
-  }
-
-  // Loan application methods
-  async submitLoanApplication(request: LoanApplicationRequest): Promise<LoanApplication> {
-    return this.request<LoanApplication>('/loans', {
+  // User Management
+  async login(request: UserLoginRequest): Promise<UserResponse> {
+    return this.request<UserResponse>('/users/login', {
       method: 'POST',
       body: JSON.stringify(request),
     });
   }
 
-  async getMyApplications(): Promise<LoanApplication[]> {
-    return this.request<LoanApplication[]>('/loans/my');
+  async getUserById(id: number): Promise<UserResponse> {
+    return this.request<UserResponse>(`/users/${id}`);
+  }
+
+  async getUserByEmail(email: string): Promise<UserResponse> {
+    return this.request<UserResponse>(`/users/email/${email}`);
+  }
+
+  async promoteToAdmin(email: string): Promise<UserResponse> {
+    return this.request<UserResponse>(`/users/${email}/promote-admin`, {
+      method: 'PUT',
+    });
+  }
+
+  // Loan Applications
+  async submitLoanApplication(
+    request: LoanApplicationRequest, 
+    userEmail: string
+  ): Promise<LoanApplication> {
+    const queryParams = new URLSearchParams({ userEmail });
+    return this.request<LoanApplication>(`/loans?${queryParams}`, {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async getMyApplications(userEmail: string): Promise<LoanApplication[]> {
+    const queryParams = new URLSearchParams({ userEmail });
+    return this.request<LoanApplication[]>(`/loans/my?${queryParams}`);
   }
 
   async getAllApplications(
-    page: number = 0,
-    size: number = 10,
+    page: number = 0, 
+    size: number = 10, 
     search?: string
-  ): Promise<ApiResponse<LoanApplication>> {
+  ): Promise<{ content: LoanApplication[]; totalElements: number; totalPages: number }> {
     const params = new URLSearchParams({
       page: page.toString(),
       size: size.toString(),
@@ -194,38 +89,59 @@ class ApiService {
     if (search) {
       params.append('search', search);
     }
-
-    return this.request<ApiResponse<LoanApplication>>(`/loans?${params.toString()}`);
+    
+    return this.request<{ content: LoanApplication[]; totalElements: number; totalPages: number }>(`/loans?${params}`);
   }
 
-  async updateLoanStatus(
-    id: number,
-    request: LoanStatusUpdateRequest
-  ): Promise<LoanApplication> {
-    return this.request<LoanApplication>(`/loans/${id}`, {
+  async approveLoan(id: number): Promise<LoanApplication> {
+    return this.request<LoanApplication>(`/loans/${id}/approve`, {
       method: 'PUT',
-      body: JSON.stringify(request),
     });
   }
 
-  async archiveOldApplications(): Promise<string> {
-    return this.request<string>('/loans/archive', {
+  async rejectLoan(id: number): Promise<LoanApplication> {
+    return this.request<LoanApplication>(`/loans/${id}/reject`, {
+      method: 'PUT',
+    });
+  }
+
+  async getRejectedApplications(): Promise<LoanApplication[]> {
+    return this.request<LoanApplication[]>('/loans/bin');
+  }
+
+  async getApplicationsByStatus(status: string): Promise<LoanApplication[]> {
+    return this.request<LoanApplication[]>(`/loans/status/${status}`);
+  }
+
+  // Bank Branches
+  async getAllBankBranches(): Promise<BankBranch[]> {
+    return this.request<BankBranch[]>('/banks');
+  }
+
+  async getBankBranchById(id: number): Promise<BankBranch> {
+    return this.request<BankBranch>(`/banks/${id}`);
+  }
+
+  async createBankBranch(bankBranch: Omit<BankBranch, 'id'>): Promise<BankBranch> {
+    return this.request<BankBranch>('/banks', {
       method: 'POST',
+      body: JSON.stringify(bankBranch),
     });
   }
 
-  // Utility methods
-  isAuthenticated(): boolean {
-    return !!this.token;
+  async updateBankBranch(id: number, bankBranch: BankBranch): Promise<BankBranch> {
+    return this.request<BankBranch>(`/banks/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(bankBranch),
+    });
   }
 
-  getToken(): string | null {
-    return this.token;
+  async deleteBankBranch(id: number): Promise<void> {
+    return this.request<void>(`/banks/${id}`, {
+      method: 'DELETE',
+    });
   }
 }
 
-// Create and export a singleton instance
 export const apiService = new ApiService();
-
-// Export the class for testing or custom instances
-export default ApiService;
+export default apiService;

@@ -1,24 +1,21 @@
 # Loan Application & Approval System - Spring Boot Backend
 
-A comprehensive Spring Boot REST API for managing loan applications with role-based access control, JWT authentication, and MySQL database integration.
+A simplified Spring Boot REST API for managing loan applications with **open email login** - anyone can login with any valid email format!
 
 ## 🚀 Features
 
-- **User Management**: Registration, login, and role-based access control
-- **Loan Applications**: Submit, view, approve, and reject loan applications
-- **Document Management**: Upload and manage application documents
-- **Audit Logging**: Track all system actions and changes
-- **JWT Authentication**: Secure token-based authentication
-- **Role-Based Access Control**: APPLICANT, AGENT, ADMIN roles
-- **Search & Filtering**: Advanced search capabilities for agents
-- **Archiving**: Automatic archiving of old applications
-- **CORS Enabled**: Frontend integration ready
+- **🌐 Open Email Login** - Anyone can login with any valid email
+- **🔄 Auto-User Creation** - Users automatically created as APPLICANT
+- **📝 Loan Application Management** - Submit, view, approve, and reject applications
+- **🏦 Bank Branch Selection** - Choose from available bank branches
+- **👥 Role-Based Access** - APPLICANT and ADMIN roles
+- **📊 Dashboard Support** - Real-time status updates
+- **🌍 CORS Enabled** - Frontend integration ready
 
 ## 🛠️ Tech Stack
 
 - **Framework**: Spring Boot 3.2.0
 - **Database**: MySQL 8.0
-- **Security**: Spring Security + JWT
 - **ORM**: Spring Data JPA + Hibernate
 - **Build Tool**: Maven
 - **Java Version**: 17
@@ -37,7 +34,7 @@ A comprehensive Spring Boot REST API for managing loan applications with role-ba
    CREATE DATABASE visithran_db;
    ```
 
-2. **Database Configuration** (already configured in `application.properties`):
+2. **Database Configuration** (already configured):
    - **URL**: `jdbc:mysql://localhost:3306/visithran_db?createDatabaseIfNotExist=true`
    - **Username**: `root`
    - **Password**: `Visithran@mysql#123`
@@ -45,7 +42,7 @@ A comprehensive Spring Boot REST API for managing loan applications with role-ba
 
 ## 🚀 Installation & Running
 
-1. **Clone and Navigate**:
+1. **Navigate to backend directory**:
    ```bash
    cd backend
    ```
@@ -66,113 +63,118 @@ A comprehensive Spring Boot REST API for managing loan applications with role-ba
 
 ## 🔐 Authentication
 
-### Demo Credentials
-- **Username**: `demo`
-- **Password**: `Demo@123`
-- **Role**: `APPLICANT`
+### **🌐 Open Email Login System**
+- **✅ ANYONE can login with ANY valid email format**
+- **✅ No passwords required**
+- **✅ Just provide name and email**
+- **✅ Users are automatically created if they don't exist**
+- **✅ Default role**: `APPLICANT`
 
-### JWT Token
-- **Secret**: Configured in `application.properties`
-- **Expiration**: 24 hours (86400000 ms)
-- **Format**: `Bearer <token>`
+### **📧 Valid Email Examples:**
+- `john@gmail.com`
+- `jane@yahoo.com`
+- `user123@hotmail.com`
+- `test@company.com`
+- `visitor@website.org`
+- **Any email format you want!**
+
+### **🔑 How It Works:**
+1. **First time login** → User automatically created as APPLICANT
+2. **Subsequent logins** → User retrieved from database
+3. **No authentication required** → Just valid email format
 
 ## 📡 API Endpoints
 
-### Authentication
+### **User Management**
 ```
-POST /api/auth/register    - User registration
-POST /api/auth/login       - User authentication
-```
-
-### User Management
-```
-GET  /api/users/me         - Get current user info
+POST /api/users/login          - Login/Create user with ANY email
+GET  /api/users/{id}           - Get user by ID
+GET  /api/users/email/{email}  - Get user by email
+PUT  /api/users/{email}/promote-admin - Promote user to ADMIN
 ```
 
-### Loan Applications
+### **Loan Applications**
 ```
-POST /api/loans            - Submit new loan application
-GET  /api/loans/my         - Get user's applications
-GET  /api/loans            - Get all applications (AGENT/ADMIN)
-PUT  /api/loans/{id}       - Update loan status
-POST /api/loans/archive    - Archive old applications
+POST /api/loans                - Submit new loan application
+GET  /api/loans/my             - Get user's applications
+GET  /api/loans                - Get all applications (with pagination)
+PUT  /api/loans/{id}/approve   - Approve loan
+PUT  /api/loans/{id}/reject    - Reject loan
+GET  /api/loans/bin            - Get rejected applications
+GET  /api/loans/status/{status} - Get applications by status
+```
+
+### **Bank Management**
+```
+GET    /api/banks              - Get all bank branches
+GET    /api/banks/{id}         - Get bank branch by ID
+POST   /api/banks              - Create new bank branch
+PUT    /api/banks/{id}         - Update bank branch
+DELETE /api/banks/{id}         - Delete bank branch
 ```
 
 ## 🔒 Role Permissions
 
-### APPLICANT
+### **APPLICANT (Default for everyone)**
 - Submit loan applications
 - View own applications
-- Update personal information
+- Select bank branches
+- View application status
 
-### AGENT
-- View all loan applications
+### **ADMIN (Can be promoted)**
+- View all applications
 - Approve/reject applications
-- Search and filter applications
-- Archive old applications
-
-### ADMIN
-- All AGENT permissions
-- User management
-- System configuration
-- Audit log access
+- Manage bank branches
+- Access rejected applications (bin)
+- View applications by status
 
 ## 📊 Database Schema
 
-### Users Table
+### **Users Table**
 - `id` (PK, auto)
-- `username` (unique)
-- `email` (unique)
-- `password` (BCrypt hashed)
-- `role` (APPLICANT/AGENT/ADMIN)
+- `name` (varchar)
+- `email` (unique, varchar)
+- `role` (APPLICANT/ADMIN)
 
-### Loan Applications Table
+### **Loan Applications Table**
 - `id` (PK, auto)
 - `applicant_id` (FK to Users)
-- `loan_type` (PERSONAL/BUSINESS/MORTGAGE/AUTO/STUDENT)
+- `loan_type` (PERSONAL_LOAN/EDUCATION_LOAN/HOUSE_LOAN/JEWEL_LOAN/AUTO_LOAN)
 - `amount` (decimal)
-- `status` (PENDING/APPROVED/REJECTED)
-- `rejection_reason` (text)
+- `description` (text)
+- `selected_bank_branch` (varchar)
+- `status` (SUBMITTED/APPROVED/REJECTED)
 - `created_at` (timestamp)
 
-### Application Documents Table
+### **Bank Branches Table**
 - `id` (PK, auto)
-- `loan_application_id` (FK to Loan Applications)
-- `document_name` (varchar)
-- `file_url` (varchar)
-- `file_type` (varchar)
-- `file_size` (bigint)
-
-### Audit Logs Table
-- `id` (PK, auto)
-- `loan_application_id` (FK to Loan Applications)
-- `user_id` (FK to Users)
-- `action` (varchar)
-- `details` (text)
-- `timestamp` (timestamp)
+- `branch_name` (varchar)
+- `location` (varchar)
+- `contact_number` (varchar)
+- `email` (varchar)
+- `active` (boolean)
 
 ## 🧪 Testing
 
-### Run Tests
+### **Run Tests**
 ```bash
 mvn test
 ```
 
-### Test Coverage
-- **Unit Tests**: Service layer testing
+### **Test Coverage**
+- **User Login Tests**: Open email authentication
+- **Loan Application Tests**: Submit and manage applications
 - **Integration Tests**: Controller layer testing
-- **Demo Login Test**: Verifies demo user authentication
 
 ## ⚙️ Configuration
 
-### Application Properties
+### **Application Properties**
 - **Server Port**: 8080
 - **Database**: MySQL with auto-creation
 - **JPA**: Hibernate with SQL logging
 - **CORS**: Enabled for `http://localhost:8081`
-- **JWT**: Configurable secret and expiration
 
-### CORS Configuration
+### **CORS Configuration**
 - **Allowed Origins**: `http://localhost:8081`
 - **Allowed Methods**: GET, POST, PUT, DELETE, OPTIONS
 - **Allowed Headers**: All headers
@@ -180,23 +182,36 @@ mvn test
 
 ## 🔄 Frontend Integration
 
-### TypeScript Interfaces
+### **TypeScript Interfaces**
 Complete TypeScript interfaces are provided in `src/main/resources/static/types/api-types.ts`
 
-### API Service Example
+### **API Service Example**
 ```typescript
-import { apiService } from './services/api';
-
-// Login
-const response = await apiService.login({
-  username: 'demo',
-  password: 'Demo@123'
+// Login with ANY email (no restrictions!)
+const response = await fetch('/api/users/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    name: 'Your Name',
+    email: 'your.email@anydomain.com'  // ANY valid email format!
+  })
 });
 
 // Submit loan application
-const loan = await apiService.submitLoanApplication({
-  loanType: 'PERSONAL',
-  amount: 10000
+const loanResponse = await fetch('/api/loans?userEmail=your.email@anydomain.com', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    loanType: 'PERSONAL_LOAN',
+    amount: 10000,
+    description: 'Personal expenses',
+    selectedBankBranch: 'Main Branch - Downtown'
+  })
+});
+
+// Promote user to ADMIN (for testing)
+const adminResponse = await fetch('/api/users/your.email@anydomain.com/promote-admin', {
+  method: 'PUT'
 });
 ```
 
@@ -211,12 +226,11 @@ const loan = await apiService.submitLoanApplication({
 
 - **Logging Level**: DEBUG for development
 - **SQL Logging**: Enabled with formatting
-- **Security Logging**: Authentication and authorization events
-- **Audit Trail**: Complete action tracking
+- **Application Logs**: Complete request/response tracking
 
 ## 🚀 Deployment
 
-### Docker Support
+### **Docker Support**
 ```dockerfile
 FROM openjdk:17-jdk-slim
 COPY target/loan-app-*.jar app.jar
@@ -224,22 +238,21 @@ EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app.jar"]
 ```
 
-### Production Configuration
+### **Production Configuration**
 - Update database credentials
-- Configure JWT secret
 - Set appropriate logging levels
 - Enable HTTPS
 - Configure CORS for production domains
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+### **Common Issues**
 1. **Database Connection**: Verify MySQL is running and credentials are correct
 2. **Port Conflicts**: Ensure port 8080 is available
 3. **CORS Issues**: Check frontend origin configuration
-4. **JWT Errors**: Verify secret key configuration
+4. **Email Format**: Ensure email follows valid format (user@domain.com)
 
-### Logs
+### **Logs**
 Check application logs for detailed error information:
 ```bash
 tail -f logs/application.log
@@ -248,8 +261,7 @@ tail -f logs/application.log
 ## 📚 Additional Resources
 
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
-- [Spring Security Reference](https://docs.spring.io/spring-security/reference/)
-- [JWT.io](https://jwt.io/) - JWT token debugging
+- [Spring Data JPA Reference](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
 - [MySQL Documentation](https://dev.mysql.com/doc/)
 
 ## 🤝 Contributing
@@ -266,4 +278,4 @@ This project is licensed under the MIT License.
 
 ---
 
-**Note**: This backend is designed to work seamlessly with the TypeScript React frontend. All API responses are TypeScript-friendly and include proper CORS configuration for frontend integration.
+**Note**: This backend is designed to work seamlessly with the TypeScript React frontend. All API responses are TypeScript-friendly and include proper CORS configuration for frontend integration. **🌐 OPEN ACCESS - Anyone can login with any valid email format! No restrictions!**

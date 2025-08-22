@@ -8,8 +8,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-
-@SpringBootApplication
+   @SpringBootApplication
 public class LoanAppApplication {
 
     public static void main(String[] args) {
