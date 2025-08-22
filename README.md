@@ -1,73 +1,106 @@
-# Welcome to your Lovable project
+# Loan Application & Approval System
 
-## Project info
+A comprehensive loan management system built with React.js frontend and Spring Boot backend architecture.
 
-**URL**: https://lovable.dev/projects/533d33c0-5077-448c-9d35-079cf9915a40
+## 🚀 Live Demo
 
-## How can I edit this code?
+**Demo Credentials:**
+- **Applicant**: `applicant@demo.com` / `demo123`
+- **Agent**: `agent@demo.com` / `demo123`  
+- **Admin**: `admin@demo.com` / `demo123`
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+### For Applicants
+- 🔐 Secure registration and JWT authentication
+- 📝 Multi-step loan application form with validation
+- 📎 Document upload with file validation (PDF, JPG, PNG)
+- 📊 Real-time application status tracking
+- 🔔 In-app notifications for status changes
+- 📱 Fully responsive mobile-friendly design
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/533d33c0-5077-448c-9d35-079cf9915a40) and start prompting.
+### For Agents  
+- 👥 View and manage pending applications
+- ✅ Approve or reject applications with reasons
+- 📋 Application review dashboard
+- 🔍 Search and filter capabilities
+- 📊 Performance analytics
 
-Changes made via Lovable will be committed automatically to this repo.
+### For Administrators
+- 🎛️ Full system administration dashboard
+- 👤 User management (create agents, manage accounts)
+- ⚙️ Loan type configuration (amounts, rates, terms)
+- 🗂️ Rejected applications bin with recovery
+- 📈 Comprehensive analytics and reporting
+- 🔍 Complete audit trail access
+- 📊 System performance metrics
 
-**Use your preferred IDE**
+## 🛠️ Technology Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Frontend
+- **React.js** with TypeScript
+- **Tailwind CSS** for styling with custom design system
+- **shadcn/ui** components
+- **React Router** for navigation
+- **React Query** for state management
+- **JWT** authentication
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Backend Architecture (Spring Boot)
+- **Spring Boot 3.2** with Java 17
+- **Spring Security** with JWT authentication
+- **Spring Data JPA** with MySQL
+- **RESTful API** design
+- **Role-based access control (RBAC)**
+- **Comprehensive audit logging**
 
-Follow these steps:
+### Database (MySQL)
+- **Normalized schema** with proper relationships
+- **Audit trail** for all changes
+- **Document storage** management
+- **Performance optimized** with proper indexing
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📖 Documentation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Technical Documentation
+- [Database Schema & ERD](docs/Database_Schema.md)
+- [Spring Boot Architecture](docs/Spring_Boot_Architecture.md)
+- [API Documentation](docs/API_Documentation.md)
+- [Role Permissions Matrix](docs/Role_Permissions_Matrix.md)
+- [System Workflow Diagrams](docs/System_Workflow_Diagrams.md)
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🚀 Getting Started
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Frontend Development
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Backend Setup (Spring Boot)
+```bash
+# Configure database connection in application.yml
+# Run MySQL database
+# Execute schema creation scripts
+mvn spring-boot:run
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🔧 Configuration
 
-**Use GitHub Codespaces**
+### Environment Variables
+```bash
+# Database
+DB_USERNAME=loan_admin
+DB_PASSWORD=secure_password
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# JWT
+JWT_SECRET=your_jwt_secret_key
 
-## What technologies are used for this project?
+# Email
+MAIL_HOST=smtp.gmail.com
+MAIL_USERNAME=your_email
+MAIL_PASSWORD=your_password
+```
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/533d33c0-5077-448c-9d35-079cf9915a40) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Built with ❤️ using React.js, Spring Boot, and MySQL.
