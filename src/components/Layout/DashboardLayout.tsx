@@ -147,6 +147,7 @@ const DashboardLayout = ({
               variant="ghost"
               size="sm"
               className="w-full justify-start space-x-2 text-sidebar-foreground hover:bg-sidebar-accent"
+              onClick={() => window.location.reload()}
             >
               <LogOut className="w-4 h-4" />
               <span>Sign Out</span>

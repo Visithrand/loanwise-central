@@ -380,47 +380,92 @@ const LoanApplicationForm = ({ onSubmit, loading = false }: LoanApplicationFormP
               </AlertDescription>
             </Alert>
             
+            {/* Document Upload Section */}
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="documents">Upload Documents *</Label>
-                <Input
-                  id="documents"
-                  type="file"
-                  multiple
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => handleFileUpload(e.target.files)}
-                  className="cursor-pointer"
-                />
-              </div>
-              
-              {formData.uploadedDocuments.length > 0 && (
+              <h4 className="text-lg font-semibold text-card-foreground">Required Documents</h4>
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <h4 className="font-medium">Uploaded Files:</h4>
-                  {formData.uploadedDocuments.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 border rounded">
-                      <span className="text-sm">{file.name}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFile(index)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
+                  <Label htmlFor="income-proof">Proof of Income *</Label>
+                  <Input
+                    id="income-proof"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                  />
+                  <p className="text-xs text-muted-foreground">Upload salary slip, tax returns (PDF, JPG, PNG - Max 5MB)</p>
                 </div>
-              )}
+                <div className="space-y-2">
+                  <Label htmlFor="id-proof">Identity Proof *</Label>
+                  <Input
+                    id="id-proof"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                  />
+                  <p className="text-xs text-muted-foreground">Upload passport, driver's license, or national ID (PDF, JPG, PNG - Max 5MB)</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address-proof">Address Proof</Label>
+                  <Input
+                    id="address-proof"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                  />
+                  <p className="text-xs text-muted-foreground">Upload utility bill, bank statement (PDF, JPG, PNG - Max 5MB)</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bank-statement">Bank Statement</Label>
+                  <Input
+                    id="bank-statement"
+                    type="file"
+                    accept=".pdf"
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                  />
+                  <p className="text-xs text-muted-foreground">Upload last 3 months bank statement (PDF only - Max 5MB)</p>
+                </div>
+              </div>
             </div>
             
+            {formData.uploadedDocuments.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium">Uploaded Files:</h4>
+                {formData.uploadedDocuments.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 border rounded">
+                    <span className="text-sm">{file.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeFile(index)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+            
             <div className="bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-medium mb-2">Required Documents:</h4>
-              <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>• Proof of Identity (Driver's License, Passport)</li>
-                <li>• Proof of Income (Pay stubs, Tax returns)</li>
-                <li>• Bank Statements (Last 3 months)</li>
-                <li>• Employment Verification Letter</li>
-              </ul>
+              <h4 className="font-medium mb-2">Document Checklist:</h4>
+              <div className="grid gap-2 md:grid-cols-2">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm">Proof of Identity</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm">Proof of Income</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                  <span className="text-sm">Address Proof (Optional)</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                  <span className="text-sm">Bank Statement (Optional)</span>
+                </div>
+              </div>
             </div>
           </div>
         );

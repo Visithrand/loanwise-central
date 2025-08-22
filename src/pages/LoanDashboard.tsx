@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import AdminAnalytics from "@/components/Admin/AdminAnalytics";
 import { 
   Plus, 
   Search, 
@@ -359,22 +360,21 @@ const LoanDashboard = ({ currentUser }: { currentUser: User }) => {
         );
 
       case 'analytics':
-        return (
+        return currentUser.role === 'ADMIN' ? (
+          <AdminAnalytics />
+        ) : (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <BarChart3 className="w-5 h-5" />
                 <span>Analytics & Reports</span>
               </CardTitle>
-              <CardDescription>
-                System analytics and performance metrics
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <Alert>
                 <BarChart3 className="w-4 h-4" />
                 <AlertDescription>
-                  Analytics dashboard with charts and reports would be implemented here.
+                  Access restricted to administrators only.
                 </AlertDescription>
               </Alert>
             </CardContent>
